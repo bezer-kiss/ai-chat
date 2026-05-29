@@ -8,85 +8,57 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
+
 app.use(express.json());
 
 const client = new OpenAI({
-
-  apiKey:
-    process.env.OPENROUTER_API_KEY,
-
-  baseURL:
-    "https://openrouter.ai/api/v1"
-
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY,
 });
 
 app.post("/chat", async (req, res) => {
 
-  try {
+    try {
 
-    const userMessage =
-      req.body.message;
+        const userMessage = req.body.message;
 
-    const completion =
-      await client.chat.completions.create({
+        const completion =
+            await client.chat.completions.create({
 
-        model:
-          "mistralai/mistral-7b-instruct:free",
+                model: "deepseek/deepseek-chat-v3-0324",
 
-        messages: [
+                messages: [
+                    {
+                        role: "user",
+                        content: userMessage
+                    }
+                ]
 
-          {
-            role:"system",
+            });
 
-            content:
-            `
-            Ты AI помощник
-            для организаторов мероприятий.
+        const reply =
+            completion.choices[0].message.content;
 
-            Помогай:
-            - с идеями
-            - с концепциями
-            - со сценариями
-            - с оформлением
-            - с таймингом
-            `
-          },
+        res.json({
+            reply: reply
+        });
 
-          {
-            role:"user",
-            content:userMessage
-          }
+    } catch (error) {
 
-        ]
+        console.error(error);
 
-      });
+        res.status(500).json({
+            reply: "Ошибка сервера"
+        });
 
-    res.json({
-
-      reply:
-        completion
-        .choices[0]
-        .message
-        .content
-
-    });
-
-  } catch(e){
-
-    console.log(e);
-
-    res.status(500).json({
-
-      error:"Ошибка AI"
-
-    });
-
-  }
+    }
 
 });
 
-app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
 
-  console.log("СЕРВЕР ЗАПУЩЕН");
+app.listen(PORT, () => {
+
+    console.log("СЕРВЕР ЗАПУЩЕН");
 
 });
