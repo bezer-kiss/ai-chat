@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
+import fs from "fs";
 
 dotenv.config();
 
@@ -10,6 +11,24 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
+const knowledge = `
+
+${fs.readFileSync("./knowledge/center.txt", "utf8")}
+
+${fs.readFileSync("./knowledge/halls.txt", "utf8")}
+
+${fs.readFileSync("./knowledge/restrictions.txt", "utf8")}
+
+${fs.readFileSync("./knowledge/events.txt", "utf8")}
+
+${fs.readFileSync("./knowledge/security.txt", "utf8")}
+
+${fs.readFileSync("./knowledge/social_media.txt", "utf8")}
+
+${fs.readFileSync("./knowledge/laws.txt", "utf8")}
+
+`;
 
 const client = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
